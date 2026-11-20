@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deep Ocean Transformations</title>
+  <style>
+    body { font: 1rem system-ui, sans-serif; background: #071f36; color: #e2e8f0; min-height: 100vh; display: grid; place-items: center; margin: 0; }
+    main { max-width: 38rem; padding: 2rem; text-align: center; }
+    a { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <main id="status">
+    <h1>Deep Ocean Transformations</h1>
+    <p>Loading the program…</p>
+    <p>If it does not load, <a href="./Transformations">open the program directly</a>.</p>
+  </main>
+  <script>
+    fetch('./Transformations')
+      .then(response => {
+        if (!response.ok) throw new Error(`Could not load the program (${response.status}).`);
+        return response.text();
+      })
+      .then(html => {
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch(error => {
+        document.getElementById('status').insertAdjacentHTML('beforeend', `<p>${error.message} Check that GitHub Pages is enabled and publishing the repository root.</p>`);
+      });
+  </script>
+</body>
+</html>

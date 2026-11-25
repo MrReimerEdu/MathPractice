@@ -3,631 +3,1249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Ocean Transformations</title>
+    <title>Deep Ocean Transformations — Grade 8 Mapping Rules</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --ocean-top: #061a2e;
+            --ocean-mid: #0a2e4d;
+            --ocean-deep: #041322;
+            --panel-bg: rgba(11, 34, 58, 0.88);
+            --panel-border: rgba(125, 211, 252, 0.16);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom, #071f36 0%, #0a3a60 50%, #041f3a 100%);
+            background: linear-gradient(180deg, var(--ocean-top) 0%, var(--ocean-mid) 52%, var(--ocean-deep) 100%);
             color: #e2e8f0;
             min-height: 100vh;
-            overflow-x: hidden;
             margin: 0;
+            overflow-x: hidden;
         }
 
-        /* Standard Clean Glass Panels */
-        .panel {
-            background: rgba(15, 35, 60, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Clean, crisp panels with no glowing text */
+        .ocean-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
             border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 30px rgba(2, 10, 20, 0.45);
         }
 
-        /* Button Styling (Clean, no glow) */
-        .btn-primary {
-            background-color: #0284c7; /* Tailwind sky-600 */
-            color: white;
-            transition: all 0.2s;
-            border: 1px solid #0369a1;
-        }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #0369a1; /* Tailwind sky-700 */
-            transform: translateY(-2px);
-        }
-        .btn-primary:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .btn-option {
-            background-color: #1e3a5f;
-            border: 1px solid #3b82f6;
-            color: #f8fafc;
-            transition: all 0.2s;
-        }
-        .btn-option:hover {
-            background-color: #2563eb;
-            transform: translateY(-2px);
-        }
-
-        /* Background Fish Animations */
-        #animation-container {
+        /* Background Swimming Fish Layer */
+        #ocean-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            inset: 0;
+            z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
 
-        .fish {
+        .fish-silhouette {
             position: absolute;
-            font-size: 2rem;
-            white-space: nowrap;
-            opacity: 0.4;
+            opacity: 0.16;
+            will-change: transform;
             animation-timing-function: linear;
             animation-iteration-count: infinite;
         }
 
         @keyframes swimRight {
-            0% { transform: translateX(-150px) scaleX(-1); }
-            100% { transform: translateX(110vw) scaleX(-1); }
+            0% { transform: translateX(-180px); }
+            100% { transform: translateX(calc(100vw + 180px)); }
         }
 
         @keyframes swimLeft {
-            0% { transform: translateX(110vw); }
-            100% { transform: translateX(-150px); }
+            0% { transform: translateX(calc(100vw + 180px)) scaleX(-1); }
+            100% { transform: translateX(-180px) scaleX(-1); }
         }
 
-        /* Animation Pause Utility */
-        .paused * {
+        @keyframes bubbleRise {
+            0% { transform: translateY(105vh) scale(0.8); opacity: 0; }
+            15% { opacity: 0.22; }
+            85% { opacity: 0.18; }
+            100% { transform: translateY(-10vh) scale(1.1); opacity: 0; }
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 9999px;
+            border: 1px solid rgba(186, 230, 253, 0.35);
+            background: rgba(186, 230, 253, 0.08);
+            animation-name: bubbleRise;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        /* Pause all background animations cleanly */
+        #ocean-bg.bg-paused * {
             animation-play-state: paused !important;
         }
 
-        /* Splash Screen Overlay */
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(to bottom, #04101e, #0a2e4f);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            text-align: center;
-            transition: opacity 0.5s ease;
+        /* Option buttons */
+        .option-btn {
+            background: rgba(15, 48, 80, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #f1f5f9;
+            transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            background: rgba(20, 72, 118, 0.95);
+            border-color: rgba(56, 189, 248, 0.8);
+            transform: translateY(-1px);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .option-btn.correct {
+            background: rgba(6, 95, 70, 0.92);
+            border-color: #34d399;
+            color: #ecfdf5;
+        }
+        .option-btn.wrong {
+            background: rgba(127, 29, 29, 0.92);
+            border-color: #f87171;
+            color: #fef2f2;
         }
 
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-            z-index: 50;
-        }
-        .toast.show {
-            transform: translateX(0);
+        /* Submarine progress indicator */
+        .sub-track {
+            background: rgba(15, 42, 70, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.25);
         }
 
-        /* Achievement Modal */
-        #achievement-modal {
-            transition: opacity 0.3s ease;
+        /* Smooth modal transitions */
+        .modal-backdrop {
+            transition: opacity 0.25s ease;
         }
     </style>
 </head>
-<body class="p-4 sm:p-8 flex flex-col items-center">
+<body class="relative min-h-screen flex flex-col">
 
-    <!-- Splash Screen -->
-    <div id="splash-screen">
-        <div class="max-w-2xl panel p-10 flex flex-col items-center">
-            <h1 class="text-4xl font-bold text-sky-400 mb-6">Deep Ocean Transformations</h1>
-            <p class="text-xl text-slate-300 italic mb-8 leading-relaxed">
-                "Just as the ocean currents shift the sands, every point in the deep must find its new path. Dive in and transform your coordinates."
-            </p>
-            <button onclick="startApp()" class="btn-primary px-8 py-3 rounded-lg text-lg font-semibold w-full sm:w-auto">
+    <!-- Background Ocean Animation Layer -->
+    <div id="ocean-bg" aria-hidden="true"></div>
+
+    <!-- Opening Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-[#041220] via-[#08243e] to-[#030e1a] transition-opacity duration-500">
+        <div class="ocean-panel max-w-2xl w-full p-8 sm:p-12 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-900/60 border border-teal-500/30 mb-6">
+                <svg class="w-9 h-9 text-teal-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12c2.5-3.5 6-5.5 10-5.5s7.5 2 10 5.5c-2.5 3.5-6 5.5-10 5.5S4.5 15.5 2 12z"/>
+                    <circle cx="15" cy="11" r="1.2" fill="currentColor"/>
+                    <path d="M2 12l-1-3m1 3l-1 3"/>
+                </svg>
+            </div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-teal-300 mb-3">Grade 8 Coordinate Geometry</p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-100 mb-6 tracking-tight">
+                Deep Ocean Transformations
+            </h1>
+            <blockquote class="text-lg sm:text-xl text-slate-300 italic leading-relaxed mb-8 px-2">
+                “In the deepest trenches of the ocean, the current shifts, mirrors, and turns every creature—yet no matter how far you translate or rotate, your true shape remains unchanged.”
+            </blockquote>
+            <button id="start-dive-btn" onclick="startApp()" class="px-8 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-base sm:text-lg transition-colors shadow-lg w-full sm:w-auto">
                 Start Dive
             </button>
         </div>
     </div>
 
-    <!-- Background Animations -->
-    <div id="animation-container"></div>
+    <!-- Main Application Shell -->
+    <div id="app-shell" class="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-8 flex-1 flex flex-col hidden opacity-0 transition-opacity duration-500">
 
-    <!-- Main App Container (Hidden initially) -->
-    <div id="app-container" class="w-full max-w-5xl hidden opacity-0 transition-opacity duration-500">
-        
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 panel p-4">
-            <h1 class="text-2xl sm:text-3xl font-bold text-sky-300">Transformation Mapping</h1>
-            
-            <div class="flex flex-wrap gap-2 justify-center items-center">
-                <!-- Modes -->
-                <button id="btn-standard" class="px-4 py-2 rounded font-medium bg-sky-600 text-white transition-colors" onclick="setMode('standard')">Standard</button>
-                <button id="btn-challenge" class="px-4 py-2 rounded font-medium bg-slate-700 text-slate-400 cursor-not-allowed transition-colors" onclick="setMode('challenge')" disabled>Challenge (Locked)</button>
-                <button id="btn-game" class="px-4 py-2 rounded font-medium bg-slate-700 text-white hover:bg-slate-600 transition-colors" onclick="setMode('game')">Submarine Dash</button>
-                <!-- Freeze Toggle -->
-                <div class="w-px h-8 bg-slate-600 mx-2 hidden md:block"></div>
-                <button id="freeze-btn" onclick="toggleAnimations()" class="px-4 py-2 rounded font-medium bg-teal-700 hover:bg-teal-600 text-white flex items-center gap-2 border border-teal-500">
-                    <span>⏸️</span> Freeze Background
+        <!-- Top Navigation Bar -->
+        <header class="ocean-panel p-4 mb-6 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-900/70 border border-sky-500/30 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12h18M12 3v18"/>
+                        <circle cx="16" cy="8" r="2" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold text-slate-100 leading-tight">Deep Ocean Transformations</h1>
+                    <p class="text-xs text-slate-400">Grade 8 Mapping Rules Practice</p>
+                </div>
+            </div>
+
+            <!-- Mode Selector & Controls -->
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <button id="tab-standard" onclick="switchMode('standard')" class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-sky-600 text-white transition-colors">
+                    Standard
+                </button>
+                <button id="tab-challenge" onclick="switchMode('challenge')" disabled class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-slate-800/80 text-slate-400 border border-slate-700 cursor-not-allowed transition-colors">
+                    Challenge (10 Streak)
+                </button>
+                <button id="tab-game" onclick="switchMode('game')" class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors">
+                    Submarine Dash
+                </button>
+
+                <div class="hidden sm:block w-px h-7 bg-slate-700 mx-1"></div>
+
+                <button onclick="openRulesModal()" class="px-3.5 py-2 rounded-lg text-sm font-medium bg-slate-800 hover:bg-slate-700 text-sky-200 border border-sky-700/50 transition-colors">
+                    Mapping Rules
+                </button>
+                <button id="freeze-bg-btn" onclick="toggleBackgroundAnimation()" class="px-3.5 py-2 rounded-lg text-sm font-medium bg-teal-800/80 hover:bg-teal-700 text-teal-100 border border-teal-500/40 transition-colors flex items-center gap-1.5">
+                    <span id="freeze-icon">⏸</span>
+                    <span id="freeze-label">Freeze Background</span>
                 </button>
             </div>
         </header>
 
-        <!-- Main Layout Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Left Column: Stats & Guide -->
-            <div class="flex flex-col gap-6">
-                
-                <!-- Stats Panel -->
-                <div class="panel p-6 text-center">
-                    <div id="streak-container">
-                        <h2 class="text-lg text-slate-300 font-medium mb-1">Current Streak</h2>
-                        <div class="text-5xl font-bold text-sky-400" id="streak-counter">0</div>
-                        <p class="text-sm text-slate-400 mt-2">Highest: <span id="highest-streak">0</span></p>
+        <!-- Main Content Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+
+            <!-- Left Sidebar: Stats & Progress -->
+            <aside class="lg:col-span-4 flex flex-col gap-5">
+
+                <!-- Practice Streak Panel -->
+                <section id="practice-stats-panel" class="ocean-panel p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Current Streak</span>
+                        <span id="challenge-status-pill" class="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                            Challenge Locked
+                        </span>
                     </div>
-                    
-                    <div id="game-stats-container" class="hidden">
-                        <h2 class="text-lg text-slate-300 font-medium mb-1">Time Left</h2>
-                        <div class="text-5xl font-bold text-red-400" id="timer-display">60</div>
-                        <h3 class="text-lg text-slate-300 mt-4">Score: <span id="game-score" class="text-2xl font-bold text-sky-400">0</span></h3>
-                        <button id="start-game-btn" class="mt-4 w-full py-2 bg-emerald-600 hover:bg-emerald-500 rounded font-bold text-white transition-colors" onclick="startGame()">Start Dash</button>
+
+                    <div class="flex items-baseline gap-3 mb-4">
+                        <span id="streak-value" class="text-5xl font-extrabold text-sky-300 tabular-nums">0</span>
+                        <span class="text-sm text-slate-400">in a row</span>
+                    </div>
+
+                    <!-- Progress bar to next milestone -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5">
+                            <span id="milestone-label">Next milestone: 10 (Challenge Mode)</span>
+                            <span id="milestone-fraction" class="font-semibold text-slate-300">0 / 10</span>
+                        </div>
+                        <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                            <div id="milestone-bar" class="h-full bg-teal-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-slate-700/70 text-center">
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <div class="text-xs text-slate-400 mb-0.5">Best Streak</div>
+                            <div id="best-streak-value" class="text-xl font-bold text-slate-100 tabular-nums">0</div>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <div class="text-xs text-slate-400 mb-0.5">Total Solved</div>
+                            <div id="total-solved-value" class="text-xl font-bold text-slate-100 tabular-nums">0</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Submarine Dash Stats Panel (Visible only in Game Mode) -->
+                <section id="game-stats-panel" class="ocean-panel p-6 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-teal-300">Submarine Dash</span>
+                        <span id="combo-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-900/70 text-sky-200 border border-sky-600/40">
+                            1x Combo
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-slate-900/60 rounded-xl p-3.5 text-center border border-slate-700/60">
+                            <div class="text-xs text-slate-400 mb-1">Time Left</div>
+                            <div id="game-timer" class="text-3xl font-extrabold text-amber-300 tabular-nums">60s</div>
+                        </div>
+                        <div class="bg-slate-900/60 rounded-xl p-3.5 text-center border border-slate-700/60">
+                            <div class="text-xs text-slate-400 mb-1">Depth</div>
+                            <div id="game-depth" class="text-3xl font-extrabold text-teal-300 tabular-nums">0m</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/60 rounded-xl p-3.5 text-center border border-slate-700/60 mb-4">
+                        <div class="text-xs text-slate-400 mb-1">Score</div>
+                        <div id="game-score" class="text-2xl font-bold text-slate-100 tabular-nums">0</div>
+                    </div>
+
+                    <!-- Submarine Depth Visual -->
+                    <div class="sub-track rounded-xl p-3 mb-4">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1.5">
+                            <span>Surface (0m)</span>
+                            <span>Abyss (2000m)</span>
+                        </div>
+                        <div class="w-full h-3 rounded-full bg-slate-900 overflow-hidden">
+                            <div id="depth-bar" class="h-full bg-sky-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <button id="game-action-btn" onclick="startSubmarineDash()" class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-colors">
+                        Launch Submarine
+                    </button>
+                    <p class="text-xs text-slate-400 text-center mt-2.5">
+                        Correct: +Depth &amp; Combo &bull; Wrong: -3s &amp; Reset Combo
+                    </p>
+                </section>
+
+                <!-- Quick Tip Card -->
+                <section class="ocean-panel p-5 text-sm text-slate-300">
+                    <h2 class="text-sm font-bold text-sky-300 uppercase tracking-wider mb-2">Navigator's Tip</h2>
+                    <p id="mode-tip-text" class="leading-relaxed text-slate-300">
+                        In Standard Mode, apply the mapping rule carefully to both coordinates. Watch your negative signs when rotating clockwise around the origin!
+                    </p>
+                </section>
+            </aside>
+
+            <!-- Right Main Area: Question & Options -->
+            <section class="lg:col-span-8 ocean-panel p-6 sm:p-8 flex flex-col justify-between">
+                <div>
+                    <!-- Question Header -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+                        <span id="mode-badge" class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sky-900/70 text-sky-200 border border-sky-600/40">
+                            Standard Practice
+                        </span>
+                        <span id="question-type-badge" class="px-3 py-1 rounded-full text-xs font-medium bg-slate-800/90 text-slate-300 border border-slate-700">
+                            Transformation
+                        </span>
+                    </div>
+
+                    <!-- Question Prompt -->
+                    <div id="question-container" class="mb-7">
+                        <p id="question-prompt" class="text-xl sm:text-2xl font-bold text-slate-100 leading-snug mb-3">
+                            Loading question...
+                        </p>
+                        <p id="question-subtext" class="text-sm text-slate-400">
+                            Choose the correct image point from the 5 options below.
+                        </p>
+                    </div>
+
+                    <!-- 5 Multiple Choice Options -->
+                    <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6">
+                        <!-- Dynamically populated -->
                     </div>
                 </div>
 
-                <!-- Reference Guide -->
-                <div class="panel p-6 text-sm text-slate-200 h-full">
-                    <h3 class="font-bold text-lg text-sky-300 mb-3 border-b border-sky-800 pb-2">Reference Guide</h3>
-                    <p class="italic text-xs mb-3 text-sky-200 bg-sky-900/30 p-2 rounded border border-sky-800/50">
-                        Referencing: 1a. Transformation Mapping Rules Summary
-                    </p>
-                    <ul class="space-y-3 list-disc pl-4">
-                        <li><strong>Translation:</strong> <br>(x, y) → (x + a, y + b)</li>
-                        <li><strong>Reflection (x-axis):</strong> <br>(x, y) → (x, -y)</li>
-                        <li><strong>Reflection (y-axis):</strong> <br>(x, y) → (-x, y)</li>
-                        <li><strong>Rotation (90° CW origin):</strong> <br>(x, y) → (y, -x)</li>
-                        <li><strong>Rotation (180° CW origin):</strong> <br>(x, y) → (-x, -y)</li>
-                        <li><strong>Rotation (270° CW origin):</strong> <br>(x, y) → (-y, x)</li>
+                <!-- Feedback & Next Question Area -->
+                <div id="feedback-box" class="hidden rounded-xl p-4 sm:p-5 border transition-all">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div id="feedback-title" class="font-bold text-base"></div>
+                            <div id="feedback-rule" class="text-sm font-medium text-sky-200"></div>
+                            <div id="feedback-steps" class="text-sm text-slate-300"></div>
+                        </div>
+                        <button id="next-question-btn" onclick="nextQuestion()" class="px-5 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shrink-0 transition-colors">
+                            Next Question →
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Achievement Popup Modal -->
+    <div id="achievement-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/75 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="ocean-panel max-w-md w-full p-7 text-center border-teal-500/40">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-3xl">
+                🏆
+            </div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-amber-300 mb-1">Achievement Unlocked</p>
+            <h2 id="ach-title" class="text-2xl font-extrabold text-slate-100 mb-2">Challenge Mode Unlocked!</h2>
+            <p id="ach-desc" class="text-sm text-slate-300 leading-relaxed mb-6">
+                You reached 10 correct answers in a row! Switching you into Challenge Mode.
+            </p>
+            <button onclick="closeAchievementModal()" class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-colors">
+                Continue Diving
+            </button>
+        </div>
+    </div>
+
+    <!-- Reference Rules Modal -->
+    <div id="rules-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/75 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="ocean-panel max-w-lg w-full p-6 sm:p-7 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700/80">
+                <h2 class="text-lg font-bold text-slate-100">Grade 8 Mapping Rules Summary</h2>
+                <button onclick="closeRulesModal()" class="text-slate-400 hover:text-slate-200 text-xl font-bold px-2">&times;</button>
+            </div>
+            <div class="space-y-4 text-sm text-slate-300">
+                <div class="bg-slate-900/60 rounded-lg p-3.5 border border-slate-700/60">
+                    <h3 class="font-bold text-sky-300 mb-1">Translations</h3>
+                    <p><span class="font-semibold text-slate-100">(x, y) → (x + a, y + b)</span></p>
+                    <p class="text-xs text-slate-400 mt-1">Positive <em>a</em> moves right, negative <em>a</em> moves left. Positive <em>b</em> moves up, negative <em>b</em> moves down.</p>
+                </div>
+                <div class="bg-slate-900/60 rounded-lg p-3.5 border border-slate-700/60">
+                    <h3 class="font-bold text-sky-300 mb-1">Reflections</h3>
+                    <ul class="space-y-1">
+                        <li>Over the <strong>x-axis</strong>: <span class="font-semibold text-slate-100">(x, y) → (x, −y)</span></li>
+                        <li>Over the <strong>y-axis</strong>: <span class="font-semibold text-slate-100">(x, y) → (−x, y)</span></li>
+                        <li class="text-xs text-slate-400 pt-1">Challenge: Over <em>x = c</em> → (2c − x, y); Over <em>y = c</em> → (x, 2c − y)</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-900/60 rounded-lg p-3.5 border border-slate-700/60">
+                    <h3 class="font-bold text-sky-300 mb-1">Clockwise Rotations (Around Origin)</h3>
+                    <ul class="space-y-1">
+                        <li><strong>90° clockwise</strong>: <span class="font-semibold text-slate-100">(x, y) → (y, −x)</span></li>
+                        <li><strong>180° clockwise</strong>: <span class="font-semibold text-slate-100">(x, y) → (−x, −y)</span></li>
+                        <li><strong>270° clockwise</strong>: <span class="font-semibold text-slate-100">(x, y) → (−y, x)</span></li>
+                        <li class="text-xs text-slate-400 pt-1">Challenge: Around (h, k), shift by (−h, −k), rotate, then shift back by (+h, +k).</li>
                     </ul>
                 </div>
             </div>
-
-            <!-- Right Column: Question Area -->
-            <div class="lg:col-span-2 panel p-6 sm:p-10 flex flex-col justify-between min-h-[450px]">
-                <div>
-                    <div class="flex justify-between items-center mb-6">
-                        <span id="mode-badge" class="px-3 py-1 rounded bg-sky-900/50 text-sky-300 text-xs font-semibold uppercase tracking-wide border border-sky-700">Standard Practice</span>
-                        <span id="feedback-icon" class="text-2xl opacity-0 transition-opacity"></span>
-                    </div>
-                    
-                    <h2 id="question-text" class="text-2xl sm:text-3xl font-semibold mb-8 leading-tight text-white">
-                        Loading question...
-                    </h2>
-
-                    <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Options injected by JS -->
-                    </div>
-                </div>
-            </div>
+            <button onclick="closeRulesModal()" class="mt-5 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold transition-colors">
+                Close Guide
+            </button>
         </div>
-    </div>
-
-    <!-- Achievement Modal -->
-    <div id="achievement-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 opacity-0 pointer-events-none">
-        <div class="panel p-8 text-center max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="achievement-card">
-            <div class="text-5xl mb-4">🏆</div>
-            <h2 class="text-2xl font-bold text-amber-400 mb-2" id="achievement-title">Achievement Unlocked!</h2>
-            <p class="text-slate-300 mb-6" id="achievement-desc">You've reached a streak of 10!</p>
-            <button onclick="closeAchievement()" class="btn-primary px-6 py-2 rounded font-bold w-full">Awesome!</button>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast panel border-l-4 border-l-red-500 p-4 flex items-center gap-3 w-64">
-        <span id="toast-icon">❌</span>
-        <div id="toast-message" class="font-medium text-slate-100">Wrong Answer!</div>
     </div>
 
     <script>
-        // --- State Management ---
-        let state = {
-            mode: 'standard', // 'standard', 'challenge', 'game'
+        /* =========================================================================
+           1. CORE MATH & FORMATTING HELPERS (Bug-Free Coordinate Handling)
+           ========================================================================= */
+
+        /**
+         * Eliminates floating-point noise and negative zero (-0).
+         */
+        function cleanNum(n) {
+            const r = Math.round(n * 100) / 100;
+            return Object.is(r, -0) || r === 0 ? 0 : r;
+        }
+
+        /**
+         * Formats a coordinate pair consistently as "(x, y)".
+         */
+        function formatPoint(x, y) {
+            return `(${cleanNum(x)}, ${cleanNum(y)})`;
+        }
+
+        /**
+         * Formats a signed offset for mapping rule notation, e.g. "x - 4" or "y + 3".
+         */
+        function formatShiftExpr(varName, delta) {
+            const d = cleanNum(delta);
+            return d >= 0 ? `${varName} + ${d}` : `${varName} - ${Math.abs(d)}`;
+        }
+
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function shuffle(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        /**
+         * Non-zero integer in [-max..-1, 1..max].
+         */
+        function randNonZeroInt(max) {
+            const vals = [];
+            for (let i = -max; i <= max; i++) {
+                if (i !== 0) vals.push(i);
+            }
+            return pickRandom(vals);
+        }
+
+        /**
+         * Non-zero 0.5-step value in [-max..-0.5, 0.5..max].
+         */
+        function randNonZeroHalfStep(max) {
+            const vals = [];
+            for (let i = -max * 2; i <= max * 2; i++) {
+                if (i !== 0) vals.push(cleanNum(i / 2));
+            }
+            return pickRandom(vals);
+        }
+
+        /**
+         * Generates a 0.5-step coordinate in [-max..max].
+         */
+        function randHalfStep(max) {
+            return cleanNum(randInt(-max * 2, max * 2) / 2);
+        }
+
+        /* =========================================================================
+           2. APPLICATION STATE
+           ========================================================================= */
+
+        const state = {
+            mode: 'standard', // 'standard' | 'challenge' | 'game'
             streak: 0,
-            highestStreak: 0,
+            bestStreak: 0,
+            totalSolved: 0,
             challengeUnlocked: false,
-            score: 0,
-            timeLeft: 0,
-            timerId: null,
+            unlockedAchievements: new Set(),
+            bgPaused: false,
             currentQuestion: null,
+            awaitingNext: false,
+            // Submarine Dash game state
             gameActive: false,
-            animationsPaused: false
+            gameTimeLeft: 60,
+            gameScore: 0,
+            gameDepth: 0,
+            gameCombo: 1,
+            gameTimerId: null
         };
 
-        const DOM = {
-            app: document.getElementById('app-container'),
-            splash: document.getElementById('splash-screen'),
-            streak: document.getElementById('streak-counter'),
-            highStreak: document.getElementById('highest-streak'),
-            question: document.getElementById('question-text'),
-            options: document.getElementById('options-container'),
-            toast: document.getElementById('toast'),
-            toastMsg: document.getElementById('toast-message'),
-            toastIcon: document.getElementById('toast-icon'),
-            achModal: document.getElementById('achievement-modal'),
-            achCard: document.getElementById('achievement-card'),
-            achTitle: document.getElementById('achievement-title'),
-            achDesc: document.getElementById('achievement-desc'),
-            btnChallenge: document.getElementById('btn-challenge'),
-            modeBadge: document.getElementById('mode-badge'),
-            streakContainer: document.getElementById('streak-container'),
-            gameStatsContainer: document.getElementById('game-stats-container'),
-            timerDisplay: document.getElementById('timer-display'),
-            gameScore: document.getElementById('game-score'),
-            startGameBtn: document.getElementById('start-game-btn'),
-            feedbackIcon: document.getElementById('feedback-icon'),
-            animContainer: document.getElementById('animation-container'),
-            freezeBtn: document.getElementById('freeze-btn')
-        };
+        /* =========================================================================
+           3. BACKGROUND FISH & BUBBLES ANIMATION
+           ========================================================================= */
 
-        // --- Initialization ---
-        function startApp() {
-            DOM.splash.style.opacity = '0';
-            setTimeout(() => {
-                DOM.splash.style.display = 'none';
-                DOM.app.classList.remove('hidden');
-                setTimeout(() => DOM.app.classList.remove('opacity-0'), 50);
-            }, 500);
-            spawnFish(8);
-            generateQuestion();
-        }
+        function initOceanBackground() {
+            const container = document.getElementById('ocean-bg');
+            container.innerHTML = '';
 
-        // --- Background Animations ---
-        function spawnFish(count) {
-            const fishTypes = ['🐟', '🐡', '🦈', '🐠'];
-            for(let i=0; i<count; i++) {
-                let f = document.createElement('div');
-                f.className = 'fish';
-                f.innerText = fishTypes[Math.floor(Math.random() * fishTypes.length)];
-                
-                // Random properties
-                let isRight = Math.random() > 0.5;
-                f.style.top = `${Math.random() * 80 + 10}vh`; // 10% to 90% vertical
-                f.style.animationName = isRight ? 'swimRight' : 'swimLeft';
-                f.style.animationDuration = `${Math.random() * 20 + 15}s`; // 15-35 seconds
-                f.style.animationDelay = `-${Math.random() * 15}s`; // Start randomly in the cycle
-                f.style.fontSize = `${Math.random() * 1.5 + 1.5}rem`;
-                
-                DOM.animContainer.appendChild(f);
-            }
-        }
-
-        function toggleAnimations() {
-            state.animationsPaused = !state.animationsPaused;
-            if (state.animationsPaused) {
-                DOM.animContainer.classList.add('paused');
-                DOM.freezeBtn.innerHTML = '<span>▶️</span> Resume Background';
-                DOM.freezeBtn.classList.replace('bg-teal-700', 'bg-amber-600');
-                DOM.freezeBtn.classList.replace('hover:bg-teal-600', 'hover:bg-amber-500');
-                DOM.freezeBtn.classList.replace('border-teal-500', 'border-amber-500');
-            } else {
-                DOM.animContainer.classList.remove('paused');
-                DOM.freezeBtn.innerHTML = '<span>⏸️</span> Freeze Background';
-                DOM.freezeBtn.classList.replace('bg-amber-600', 'bg-teal-700');
-                DOM.freezeBtn.classList.replace('hover:bg-amber-500', 'hover:bg-teal-600');
-                DOM.freezeBtn.classList.replace('border-amber-500', 'border-teal-500');
-            }
-        }
-
-        // --- Core Logic ---
-        function setMode(mode) {
-            if (mode === 'challenge' && !state.challengeUnlocked) return;
-            
-            if (state.mode === 'game' && state.gameActive) {
-                endGame(false);
-            }
-
-            state.mode = mode;
-            
-            // UI Button Updates
-            ['standard', 'challenge', 'game'].forEach(m => {
-                let btn = document.getElementById(`btn-${m}`);
-                if (m === mode) {
-                    btn.className = "px-4 py-2 rounded font-medium bg-sky-600 text-white transition-colors";
-                } else {
-                    if (m === 'challenge' && !state.challengeUnlocked) return; // Keep locked style
-                    btn.className = "px-4 py-2 rounded font-medium bg-slate-700 text-white hover:bg-slate-600 transition-colors";
-                }
-            });
-
-            DOM.modeBadge.innerText = mode === 'standard' ? 'Standard Practice' : 
-                                      mode === 'challenge' ? 'Challenge Mode' : 'Submarine Dash';
-
-            if (mode === 'game') {
-                DOM.streakContainer.classList.add('hidden');
-                DOM.gameStatsContainer.classList.remove('hidden');
-                DOM.options.innerHTML = '';
-                DOM.question.innerText = "Ready for the 60-second dash? Click start below!";
-            } else {
-                DOM.streakContainer.classList.remove('hidden');
-                DOM.gameStatsContainer.classList.add('hidden');
-                generateQuestion();
-            }
-        }
-
-        // --- Question Generation Engine ---
-        function generateQuestion() {
-            let point, qType, ans, desc;
-            
-            if (state.mode === 'standard' || (state.mode === 'game' && Math.random() > 0.3)) {
-                // Standard Logic (Integers)
-                let x = getRandomInt(-10, 10);
-                let y = getRandomInt(-10, 10);
-                point = {x, y};
-                qType = getRandomInt(0, 5);
-                
-                switch(qType) {
-                    case 0: // Translation
-                        let dx = getRandomInt(-5, 5);
-                        let dy = getRandomInt(-5, 5);
-                        desc = `Translate the point (${x}, ${y}) using mapping rule (x + ${dx}, y + ${dy}).`;
-                        ans = {x: x + dx, y: y + dy};
-                        break;
-                    case 1: // Ref x-axis
-                        desc = `Reflect the point (${x}, ${y}) over the x-axis.`;
-                        ans = {x: x, y: -y};
-                        break;
-                    case 2: // Ref y-axis
-                        desc = `Reflect the point (${x}, ${y}) over the y-axis.`;
-                        ans = {x: -x, y: y};
-                        break;
-                    case 3: // Rot 90 CW
-                        desc = `Rotate the point (${x}, ${y}) 90° clockwise around the origin.`;
-                        ans = {x: y, y: -x};
-                        break;
-                    case 4: // Rot 180 CW
-                        desc = `Rotate the point (${x}, ${y}) 180° clockwise around the origin.`;
-                        ans = {x: -x, y: -y};
-                        break;
-                    case 5: // Rot 270 CW
-                        desc = `Rotate the point (${x}, ${y}) 270° clockwise around the origin.`;
-                        ans = {x: -y, y: x};
-                        break;
-                }
-            } else {
-                // Challenge Logic (Decimals & Lines)
-                let x = parseFloat((Math.random() * 20 - 10).toFixed(1));
-                let y = parseFloat((Math.random() * 20 - 10).toFixed(1));
-                point = {x, y};
-                qType = getRandomInt(0, 3);
-                
-                switch(qType) {
-                    case 0: // Ref x = k
-                        let kx = getRandomInt(-5, 5);
-                        desc = `Reflect the point (${x}, ${y}) over the vertical line x = ${kx}.`;
-                        ans = {x: fixFloat(2 * kx - x), y: y};
-                        break;
-                    case 1: // Ref y = k
-                        let ky = getRandomInt(-5, 5);
-                        desc = `Reflect the point (${x}, ${y}) over the horizontal line y = ${ky}.`;
-                        ans = {x: x, y: fixFloat(2 * ky - y)};
-                        break;
-                    case 2: // Rot 90 CW about (a,b)
-                        let a = getRandomInt(-3, 3);
-                        let b = getRandomInt(-3, 3);
-                        desc = `Rotate point (${x}, ${y}) 90° clockwise around the point (${a}, ${b}).`;
-                        ans = {x: fixFloat(y - b + a), y: fixFloat(-x + a + b)};
-                        break;
-                    case 3: // Translation with decimals
-                        let dx = parseFloat((Math.random() * 10 - 5).toFixed(1));
-                        let dy = parseFloat((Math.random() * 10 - 5).toFixed(1));
-                        desc = `Translate the point (${x}, ${y}) using mapping rule (x + ${dx}, y + ${dy}).`;
-                        ans = {x: fixFloat(x + dx), y: fixFloat(y + dy)};
-                        break;
-                }
-            }
-
-            let options = generateDistractors(ans, point, qType);
-            
-            state.currentQuestion = { desc, options, ans };
-            renderQuestion();
-        }
-
-        function generateDistractors(correct, original, type) {
-            let opts = new Set();
-            opts.add(formatPoint(correct));
-            
-            // Common grade 8 mistakes
-            let pool = [
-                {x: correct.x, y: -correct.y}, // missed y sign
-                {x: -correct.x, y: correct.y}, // missed x sign
-                {x: -correct.x, y: -correct.y}, // opposite both signs
-                {x: correct.y, y: correct.x}, // swapped coordinates
-                {x: -correct.y, y: correct.x}, // swapped + missed sign
-                {x: correct.y, y: -correct.x}, 
+            // Subtle SVG fish silhouettes
+            const fishPaths = [
+                `<svg viewBox="0 0 120 50" fill="#7dd3fc"><path d="M95 25c-15-16-42-22-68-12L8 4l7 21-7 21 19-9c26 10 53 4 68-12 7-5 14-2 17 0-3-2-10 5-17 0z"/></svg>`,
+                `<svg viewBox="0 0 100 44" fill="#5eead4"><path d="M84 22C70 8 44 6 24 15L4 6l8 16-8 16 20-9c20 9 46 7 60-7z"/></svg>`,
+                `<svg viewBox="0 0 140 56" fill="#38bdf8"><path d="M120 28c-18-18-50-24-82-12L10 5l10 23-10 23 28-11c32 12 64 6 82-12z"/></svg>`
             ];
 
-            let isDecimal = !Number.isInteger(correct.x) || !Number.isInteger(correct.y);
+            for (let i = 0; i < 8; i++) {
+                const el = document.createElement('div');
+                el.className = 'fish-silhouette';
+                el.innerHTML = fishPaths[i % fishPaths.length];
 
-            let i = 0;
-            while (opts.size < 5 && i < pool.length) {
-                let p = pool[i];
-                p.x = fixFloat(p.x);
-                p.y = fixFloat(p.y);
-                opts.add(formatPoint(p));
-                i++;
+                const goRight = i % 2 === 0;
+                const width = randInt(58, 120);
+                el.style.width = `${width}px`;
+                el.style.top = `${randInt(8, 86)}vh`;
+                el.style.animationName = goRight ? 'swimRight' : 'swimLeft';
+                el.style.animationDuration = `${randInt(26, 48)}s`;
+                el.style.animationDelay = `-${randInt(0, 40)}s`;
+                container.appendChild(el);
             }
 
-            // Fill remainder with close randoms
-            while (opts.size < 5) {
-                let rx = correct.x + (isDecimal ? getRandomFloat(-2, 2) : getRandomInt(-2, 2));
-                let ry = correct.y + (isDecimal ? getRandomFloat(-2, 2) : getRandomInt(-2, 2));
-                opts.add(formatPoint({x: fixFloat(rx), y: fixFloat(ry)}));
+            // Gentle rising bubbles
+            for (let i = 0; i < 12; i++) {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                const size = randInt(6, 16);
+                b.style.width = `${size}px`;
+                b.style.height = `${size}px`;
+                b.style.left = `${randInt(4, 96)}vw`;
+                b.style.animationDuration = `${randInt(14, 28)}s`;
+                b.style.animationDelay = `-${randInt(0, 24)}s`;
+                container.appendChild(b);
             }
-
-            return shuffleArray(Array.from(opts).slice(0, 5));
         }
 
-        function renderQuestion() {
-            DOM.question.innerText = state.currentQuestion.desc;
-            DOM.options.innerHTML = '';
-            
-            state.currentQuestion.options.forEach((optStr) => {
-                let btn = document.createElement('button');
-                btn.className = "btn-option w-full py-4 px-6 rounded-lg text-lg sm:text-xl font-semibold shadow";
-                btn.innerText = optStr;
-                btn.onclick = () => handleAnswer(optStr);
-                DOM.options.appendChild(btn);
+        function toggleBackgroundAnimation() {
+            state.bgPaused = !state.bgPaused;
+            const bg = document.getElementById('ocean-bg');
+            const icon = document.getElementById('freeze-icon');
+            const label = document.getElementById('freeze-label');
+            const btn = document.getElementById('freeze-bg-btn');
+
+            if (state.bgPaused) {
+                bg.classList.add('bg-paused');
+                icon.textContent = '▶';
+                label.textContent = 'Resume Background';
+                btn.classList.replace('bg-teal-800/80', 'bg-amber-700/80');
+                btn.classList.replace('hover:bg-teal-700', 'hover:bg-amber-600');
+                btn.classList.replace('border-teal-500/40', 'border-amber-400/50');
+            } else {
+                bg.classList.remove('bg-paused');
+                icon.textContent = '⏸';
+                label.textContent = 'Freeze Background';
+                btn.classList.replace('bg-amber-700/80', 'bg-teal-800/80');
+                btn.classList.replace('hover:bg-amber-600', 'hover:bg-teal-700');
+                btn.classList.replace('border-amber-400/50', 'border-teal-500/40');
+            }
+        }
+
+        /* =========================================================================
+           4. QUESTION GENERATION ENGINE (Standard & Challenge)
+           ========================================================================= */
+
+        /**
+         * Ensures exactly 5 unique formatted coordinate strings.
+         * Uses logical distractors first, then nudges coordinates if any collide.
+         */
+        function buildUniqueOptions(correctX, correctY, logicalDistractors, isDecimalMode) {
+            const correctStr = formatPoint(correctX, correctY);
+            const optionSet = new Set([correctStr]);
+
+            for (const d of logicalDistractors) {
+                if (optionSet.size >= 5) break;
+                const str = formatPoint(d.x, d.y);
+                if (!optionSet.has(str)) {
+                    optionSet.add(str);
+                }
+            }
+
+            // Fallback nudging loop if collisions occurred
+            const step = isDecimalMode ? 0.5 : 1;
+            const nudges = [
+                [step, 0], [-step, 0], [0, step], [0, -step],
+                [step, step], [-step, -step], [step, -step], [-step, step],
+                [step * 2, 0], [-step * 2, 0], [0, step * 2], [0, -step * 2]
+            ];
+
+            let nudgeIdx = 0;
+            while (optionSet.size < 5 && nudgeIdx < nudges.length) {
+                const [nx, ny] = nudges[nudgeIdx++];
+                const str = formatPoint(correctX + nx, correctY + ny);
+                if (!optionSet.has(str)) {
+                    optionSet.add(str);
+                }
+            }
+
+            return {
+                correctStr,
+                options: shuffle(Array.from(optionSet))
+            };
+        }
+
+        /**
+         * Standard Mode Question Generator (Grade 8 Mapping Rules)
+         */
+        function generateStandardQuestion() {
+            const types = ['translation', 'reflectX', 'reflectY', 'rot90', 'rot180', 'rot270'];
+            const type = pickRandom(types);
+
+            if (type === 'translation') {
+                const x = randInt(-9, 9);
+                const y = randInt(-9, 9);
+                // Strictly non-zero horizontal AND vertical shifts
+                const dx = randNonZeroInt(8);
+                const dy = randNonZeroInt(8);
+
+                const ansX = cleanNum(x + dx);
+                const ansY = cleanNum(y + dy);
+
+                const horizText = dx > 0
+                    ? `${dx} ${dx === 1 ? 'unit' : 'units'} to the right`
+                    : `${Math.abs(dx)} ${Math.abs(dx) === 1 ? 'unit' : 'units'} to the left`;
+                const vertText = dy > 0
+                    ? `${dy} ${dy === 1 ? 'unit' : 'units'} up`
+                    : `${Math.abs(dy)} ${Math.abs(dy) === 1 ? 'unit' : 'units'} down`;
+
+                const prompt = `Translate the point ${formatPoint(x, y)} ${horizText} and ${vertText}.`;
+                const rule = `Mapping rule: (x, y) → (${formatShiftExpr('x', dx)}, ${formatShiftExpr('y', dy)})`;
+                const steps = `(${x} ${dx >= 0 ? '+' : '−'} ${Math.abs(dx)}, ${y} ${dy >= 0 ? '+' : '−'} ${Math.abs(dy)}) = ${formatPoint(ansX, ansY)}`;
+
+                const distractors = [
+                    { x: x - dx, y: y + dy }, // wrong horizontal direction
+                    { x: x + dx, y: y - dy }, // wrong vertical direction
+                    { x: x - dx, y: y - dy }, // both directions reversed
+                    { x: x + dy, y: y + dx }, // swapped dx and dy
+                    { x: ansY, y: ansX }      // swapped final coordinates
+                ];
+
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, false);
+                return { typeLabel: 'Translation', prompt, rule, steps, correctStr, options };
+            }
+
+            // For Reflections and Rotations: pick non-zero x, y with |x| !== |y|
+            let x = randNonZeroInt(9);
+            let y = randNonZeroInt(9);
+            while (Math.abs(x) === Math.abs(y)) {
+                y = randNonZeroInt(9);
+            }
+
+            if (type === 'reflectX') {
+                const ansX = x, ansY = -y;
+                const prompt = `Reflect the point ${formatPoint(x, y)} over the x-axis.`;
+                const rule = `Mapping rule (x-axis reflection): (x, y) → (x, −y)`;
+                const steps = `Keep x = ${x}, negate y → ${formatPoint(ansX, ansY)}`;
+                const distractors = [
+                    { x: -x, y: y },   // reflected over y-axis instead
+                    { x: -x, y: -y },  // negated both
+                    { x: y, y: x },    // swapped
+                    { x: y, y: -x },   // 90° CW rotation
+                    { x: -y, y: x }    // 270° CW rotation
+                ];
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, false);
+                return { typeLabel: 'Reflection (x-axis)', prompt, rule, steps, correctStr, options };
+            }
+
+            if (type === 'reflectY') {
+                const ansX = -x, ansY = y;
+                const prompt = `Reflect the point ${formatPoint(x, y)} over the y-axis.`;
+                const rule = `Mapping rule (y-axis reflection): (x, y) → (−x, y)`;
+                const steps = `Negate x, keep y = ${y} → ${formatPoint(ansX, ansY)}`;
+                const distractors = [
+                    { x: x, y: -y },   // reflected over x-axis instead
+                    { x: -x, y: -y },  // negated both
+                    { x: y, y: x },    // swapped
+                    { x: -y, y: x },   // 270° CW rotation
+                    { x: y, y: -x }    // 90° CW rotation
+                ];
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, false);
+                return { typeLabel: 'Reflection (y-axis)', prompt, rule, steps, correctStr, options };
+            }
+
+            if (type === 'rot90') {
+                const ansX = y, ansY = -x;
+                const prompt = `Rotate the point ${formatPoint(x, y)} 90° clockwise around the origin.`;
+                const rule = `Mapping rule (90° CW): (x, y) → (y, −x)`;
+                const steps = `Swap and negate the original x: (${y}, −(${x})) = ${formatPoint(ansX, ansY)}`;
+                const distractors = [
+                    { x: -y, y: x },   // 270° CW / 90° CCW
+                    { x: -x, y: -y },  // 180°
+                    { x: y, y: x },    // forgot negative sign
+                    { x: -y, y: -x },  // negated both after swap
+                    { x: x, y: -y }    // x-axis reflection
+                ];
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, false);
+                return { typeLabel: 'Rotation 90° CW', prompt, rule, steps, correctStr, options };
+            }
+
+            if (type === 'rot180') {
+                const ansX = -x, ansY = -y;
+                const prompt = `Rotate the point ${formatPoint(x, y)} 180° clockwise around the origin.`;
+                const rule = `Mapping rule (180° CW): (x, y) → (−x, −y)`;
+                const steps = `Negate both coordinates: (−(${x}), −(${y})) = ${formatPoint(ansX, ansY)}`;
+                const distractors = [
+                    { x: x, y: -y },   // only negated y
+                    { x: -x, y: y },   // only negated x
+                    { x: y, y: -x },   // 90° CW
+                    { x: -y, y: x },   // 270° CW
+                    { x: -y, y: -x }   // swapped and negated
+                ];
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, false);
+                return { typeLabel: 'Rotation 180° CW', prompt, rule, steps, correctStr, options };
+            }
+
+            // rot270
+            const ansX = -y, ansY = x;
+            const prompt = `Rotate the point ${formatPoint(x, y)} 270° clockwise around the origin.`;
+            const rule = `Mapping rule (270° CW): (x, y) → (−y, x)`;
+            const steps = `Swap and negate the original y: (−(${y}), ${x}) = ${formatPoint(ansX, ansY)}`;
+            const distractors = [
+                { x: y, y: -x },   // 90° CW
+                { x: -x, y: -y },  // 180°
+                { x: y, y: x },    // forgot negative sign
+                { x: -y, y: -x },  // negated both after swap
+                { x: -x, y: y }    // y-axis reflection
+            ];
+            const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, false);
+            return { typeLabel: 'Rotation 270° CW', prompt, rule, steps, correctStr, options };
+        }
+
+        /**
+         * Challenge Mode Question Generator (Decimals, Non-Origin Rotations, Non-Axis Reflections)
+         */
+        function generateChallengeQuestion() {
+            const types = ['translation', 'reflectLineX', 'reflectLineY', 'rotPoint'];
+            const type = pickRandom(types);
+
+            if (type === 'translation') {
+                const x = randHalfStep(8);
+                const y = randHalfStep(8);
+                const dx = randNonZeroHalfStep(5.5);
+                const dy = randNonZeroHalfStep(5.5);
+
+                const ansX = cleanNum(x + dx);
+                const ansY = cleanNum(y + dy);
+
+                const horizText = dx > 0 ? `${dx} units to the right` : `${Math.abs(dx)} units to the left`;
+                const vertText = dy > 0 ? `${dy} units up` : `${Math.abs(dy)} units down`;
+
+                const prompt = `Translate the point ${formatPoint(x, y)} ${horizText} and ${vertText}.`;
+                const rule = `Mapping rule: (x, y) → (${formatShiftExpr('x', dx)}, ${formatShiftExpr('y', dy)})`;
+                const steps = `(${x} ${dx >= 0 ? '+' : '−'} ${Math.abs(dx)}, ${y} ${dy >= 0 ? '+' : '−'} ${Math.abs(dy)}) = ${formatPoint(ansX, ansY)}`;
+
+                const distractors = [
+                    { x: x - dx, y: y + dy },
+                    { x: x + dx, y: y - dy },
+                    { x: x - dx, y: y - dy },
+                    { x: x + dy, y: y + dx },
+                    { x: ansX + 0.5, y: ansY - 0.5 }
+                ];
+
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, true);
+                return { typeLabel: 'Challenge Translation', prompt, rule, steps, correctStr, options };
+            }
+
+            if (type === 'reflectLineX') {
+                const c = randNonZeroHalfStep(4); // c !== 0
+                let x = randHalfStep(8);
+                while (cleanNum(x) === cleanNum(c)) {
+                    x = randHalfStep(8);
+                }
+                const y = randHalfStep(8);
+
+                const ansX = cleanNum(2 * c - x);
+                const ansY = cleanNum(y);
+
+                const prompt = `Reflect the point ${formatPoint(x, y)} over the vertical line x = ${c}.`;
+                const rule = `Mapping rule (over x = ${c}): (x, y) → (2(${c}) − x, y)`;
+                const steps = `x' = ${cleanNum(2 * c)} − (${x}) = ${ansX}, y' = ${ansY} → ${formatPoint(ansX, ansY)}`;
+
+                const distractors = [
+                    { x: -x, y: y },            // reflected over y-axis instead
+                    { x: c - x, y: y },         // forgot factor of 2
+                    { x: x, y: 2 * c - y },     // reflected over y = c instead
+                    { x: -x + c, y: y },        // added c once
+                    { x: ansX, y: -y }          // also negated y
+                ];
+
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, true);
+                return { typeLabel: `Reflection (x = ${c})`, prompt, rule, steps, correctStr, options };
+            }
+
+            if (type === 'reflectLineY') {
+                const c = randNonZeroHalfStep(4); // c !== 0
+                const x = randHalfStep(8);
+                let y = randHalfStep(8);
+                while (cleanNum(y) === cleanNum(c)) {
+                    y = randHalfStep(8);
+                }
+
+                const ansX = cleanNum(x);
+                const ansY = cleanNum(2 * c - y);
+
+                const prompt = `Reflect the point ${formatPoint(x, y)} over the horizontal line y = ${c}.`;
+                const rule = `Mapping rule (over y = ${c}): (x, y) → (x, 2(${c}) − y)`;
+                const steps = `x' = ${ansX}, y' = ${cleanNum(2 * c)} − (${y}) = ${ansY} → ${formatPoint(ansX, ansY)}`;
+
+                const distractors = [
+                    { x: x, y: -y },            // reflected over x-axis instead
+                    { x: x, y: c - y },         // forgot factor of 2
+                    { x: 2 * c - x, y: y },     // reflected over x = c instead
+                    { x: x, y: -y + c },        // added c once
+                    { x: -x, y: ansY }          // also negated x
+                ];
+
+                const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, true);
+                return { typeLabel: `Reflection (y = ${c})`, prompt, rule, steps, correctStr, options };
+            }
+
+            // Rotation (90°, 180°, 270° CW) around non-origin point (h, k)
+            let h = randHalfStep(3);
+            let k = randHalfStep(3);
+            while (h === 0 && k === 0) {
+                h = randNonZeroHalfStep(3);
+            }
+
+            let x = randHalfStep(7);
+            let y = randHalfStep(7);
+            while (
+                cleanNum(x) === cleanNum(h) ||
+                cleanNum(y) === cleanNum(k) ||
+                cleanNum(Math.abs(x - h)) === cleanNum(Math.abs(y - k))
+            ) {
+                x = randHalfStep(7);
+                y = randHalfStep(7);
+            }
+
+            const dx = cleanNum(x - h);
+            const dy = cleanNum(y - k);
+            const angle = pickRandom([90, 180, 270]);
+
+            let rotDx, rotDy, rule;
+            if (angle === 90) {
+                rotDx = dy;
+                rotDy = -dx;
+                rule = `Shift by (−h, −k), apply 90° CW (dx, dy) → (dy, −dx), then add (h, k)`;
+            } else if (angle === 180) {
+                rotDx = -dx;
+                rotDy = -dy;
+                rule = `Shift by (−h, −k), apply 180° CW (dx, dy) → (−dx, −dy), then add (h, k)`;
+            } else {
+                rotDx = -dy;
+                rotDy = dx;
+                rule = `Shift by (−h, −k), apply 270° CW (dx, dy) → (−dy, dx), then add (h, k)`;
+            }
+
+            const ansX = cleanNum(rotDx + h);
+            const ansY = cleanNum(rotDy + k);
+
+            const prompt = `Rotate the point ${formatPoint(x, y)} ${angle}° clockwise around the point ${formatPoint(h, k)}.`;
+            const steps = `Relative vector: (${dx}, ${dy}) → rotated: (${cleanNum(rotDx)}, ${cleanNum(rotDy)}) → add ${formatPoint(h, k)} = ${formatPoint(ansX, ansY)}`;
+
+            const distractors = [
+                { x: dy + h, y: -dx + k },   // 90° CW around (h,k)
+                { x: -dx + h, y: -dy + k },  // 180° CW around (h,k)
+                { x: -dy + h, y: dx + k },   // 270° CW around (h,k)
+                { x: y, y: -x },             // rotated around origin instead
+                { x: -x, y: -y },            // 180° around origin
+                { x: rotDx - h, y: rotDy - k } // subtracted (h,k) instead of adding
+            ];
+
+            const { correctStr, options } = buildUniqueOptions(ansX, ansY, distractors, true);
+            return { typeLabel: `Challenge Rotation ${angle}° CW`, prompt, rule, steps, correctStr, options };
+        }
+
+        /* =========================================================================
+           5. UI RENDERING & INTERACTION FLOW
+           ========================================================================= */
+
+        function startApp() {
+            const splash = document.getElementById('splash-screen');
+            const shell = document.getElementById('app-shell');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                shell.classList.remove('hidden');
+                requestAnimationFrame(() => shell.classList.remove('opacity-0'));
+            }, 450);
+
+            initOceanBackground();
+            loadNewQuestion();
+        }
+
+        function switchMode(newMode) {
+            if (newMode === 'challenge' && !state.challengeUnlocked) return;
+
+            // Stop active game if leaving game mode
+            if (state.mode === 'game' && state.gameActive && newMode !== 'game') {
+                stopSubmarineDash(false);
+            }
+
+            state.mode = newMode;
+            state.awaitingNext = false;
+
+            // Update tab styles
+            const tabs = {
+                standard: document.getElementById('tab-standard'),
+                challenge: document.getElementById('tab-challenge'),
+                game: document.getElementById('tab-game')
+            };
+
+            Object.entries(tabs).forEach(([key, btn]) => {
+                if (key === 'challenge' && !state.challengeUnlocked) return;
+                if (key === newMode) {
+                    btn.className = 'px-3.5 py-2 rounded-lg text-sm font-semibold bg-sky-600 text-white transition-colors';
+                } else {
+                    btn.className = 'px-3.5 py-2 rounded-lg text-sm font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors';
+                }
+            });
+
+            const practicePanel = document.getElementById('practice-stats-panel');
+            const gamePanel = document.getElementById('game-stats-panel');
+            const modeBadge = document.getElementById('mode-badge');
+            const tipText = document.getElementById('mode-tip-text');
+
+            hideFeedback();
+
+            if (newMode === 'game') {
+                practicePanel.classList.add('hidden');
+                gamePanel.classList.remove('hidden');
+                modeBadge.textContent = 'Submarine Dash';
+                tipText.textContent = 'Answer quickly and accurately to dive deeper and build your combo multiplier. Wrong answers cost 3 seconds!';
+                renderGameReadyState();
+            } else {
+                practicePanel.classList.remove('hidden');
+                gamePanel.classList.add('hidden');
+                if (newMode === 'standard') {
+                    modeBadge.textContent = 'Standard Practice';
+                    tipText.textContent = 'In Standard Mode, apply the mapping rule carefully to both coordinates. Watch your negative signs when rotating clockwise around the origin!';
+                } else {
+                    modeBadge.textContent = 'Challenge Mode';
+                    tipText.textContent = 'Challenge Mode introduces 0.5 decimals, reflections over x = c or y = c, and rotations around non-origin points (h, k).';
+                }
+                loadNewQuestion();
+            }
+        }
+
+        function loadNewQuestion() {
+            state.awaitingNext = false;
+            hideFeedback();
+
+            if (state.mode === 'challenge') {
+                state.currentQuestion = generateChallengeQuestion();
+            } else if (state.mode === 'game') {
+                // Mix standard (75%) and challenge (25%) in Submarine Dash
+                state.currentQuestion = Math.random() < 0.75
+                    ? generateStandardQuestion()
+                    : generateChallengeQuestion();
+            } else {
+                state.currentQuestion = generateStandardQuestion();
+            }
+
+            renderQuestion(state.currentQuestion);
+        }
+
+        function renderQuestion(q) {
+            document.getElementById('question-type-badge').textContent = q.typeLabel;
+            document.getElementById('question-prompt').textContent = q.prompt;
+            document.getElementById('question-subtext').textContent = 'Choose the correct image point from the 5 options below.';
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+
+            q.options.forEach((optStr, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'option-btn w-full py-4 px-5 rounded-xl text-lg font-semibold text-left flex items-center justify-between';
+                btn.dataset.option = optStr;
+                btn.innerHTML = `
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-400/80 mr-3">${String.fromCharCode(65 + idx)}</span>
+                    <span class="flex-1 text-center font-bold tracking-wide">${optStr}</span>
+                    <span class="w-5"></span>
+                `;
+                btn.onclick = () => handleOptionSelect(optStr, btn);
+                grid.appendChild(btn);
             });
         }
 
-        function handleAnswer(selectedOpt) {
-            let correctOpt = formatPoint(state.currentQuestion.ans);
-            let isCorrect = selectedOpt === correctOpt;
+        function handleOptionSelect(selectedOptionString, clickedBtn) {
+            if (state.mode !== 'game' && state.awaitingNext) return;
+            if (state.mode === 'game' && !state.gameActive) return;
 
-            showFeedbackIcon(isCorrect);
+            const q = state.currentQuestion;
+            // Strict string comparison — eliminates index/duplicate mismatch bugs
+            const isCorrect = selectedOptionString === q.correctStr;
 
             if (state.mode === 'game') {
-                if (isCorrect) {
-                    state.score += 10;
-                    DOM.gameScore.innerText = state.score;
-                } else {
-                    state.score = Math.max(0, state.score - 5);
-                    DOM.gameScore.innerText = state.score;
-                    showToast("Wrong Answer! -5 Points.", false);
+                handleGameAnswer(isCorrect);
+                return;
+            }
+
+            // Practice / Challenge Mode
+            state.awaitingNext = true;
+
+            const buttons = document.querySelectorAll('#options-grid button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.option === q.correctStr) {
+                    btn.classList.add('correct');
+                } else if (btn === clickedBtn && !isCorrect) {
+                    btn.classList.add('wrong');
                 }
-                if (state.gameActive) generateQuestion();
+            });
+
+            if (isCorrect) {
+                state.streak += 1;
+                state.totalSolved += 1;
+                if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+                showFeedback(true, q);
+                updatePracticeStatsUI();
+                checkAchievements();
             } else {
-                if (isCorrect) {
-                    state.streak++;
-                    if (state.streak > state.highestStreak) state.highestStreak = state.streak;
-                    DOM.streak.innerText = state.streak;
-                    DOM.highStreak.innerText = state.highestStreak;
-                    
-                    checkAchievements();
-                    generateQuestion();
-                } else {
-                    state.streak = 0;
-                    DOM.streak.innerText = state.streak;
-                    showToast("Incorrect! Streak reset to 0.", false);
-                    generateQuestion();
-                }
+                state.streak = 0;
+                showFeedback(false, q);
+                updatePracticeStatsUI();
             }
         }
+
+        function showFeedback(isCorrect, q) {
+            const box = document.getElementById('feedback-box');
+            const title = document.getElementById('feedback-title');
+            const rule = document.getElementById('feedback-rule');
+            const steps = document.getElementById('feedback-steps');
+
+            box.classList.remove('hidden', 'bg-emerald-950/70', 'border-emerald-500/40', 'bg-rose-950/70', 'border-rose-500/40');
+            if (isCorrect) {
+                box.classList.add('bg-emerald-950/70', 'border-emerald-500/40');
+                title.textContent = 'Correct! Smooth sailing.';
+                title.className = 'font-bold text-base text-emerald-300';
+            } else {
+                box.classList.add('bg-rose-950/70', 'border-rose-500/40');
+                title.textContent = `Not quite — the correct image point is ${q.correctStr}.`;
+                title.className = 'font-bold text-base text-rose-300';
+            }
+
+            rule.textContent = q.rule;
+            steps.textContent = q.steps;
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback-box').classList.add('hidden');
+        }
+
+        function nextQuestion() {
+            loadNewQuestion();
+        }
+
+        function updatePracticeStatsUI() {
+            document.getElementById('streak-value').textContent = state.streak;
+            document.getElementById('best-streak-value').textContent = state.bestStreak;
+            document.getElementById('total-solved-value').textContent = state.totalSolved;
+
+            // Milestone progress bar
+            let target = 10;
+            let label = 'Next milestone: 10 (Challenge Mode)';
+            if (state.streak >= 10 && state.streak < 20) {
+                target = 20;
+                label = 'Next milestone: 20 (Abyssal Navigator)';
+            } else if (state.streak >= 20 && state.streak < 50) {
+                target = 50;
+                label = 'Next milestone: 50 (Mariana Trench Master)';
+            } else if (state.streak >= 50) {
+                target = 50;
+                label = 'All Streak Milestones Mastered!';
+            }
+
+            const pct = Math.min(100, Math.round((state.streak / target) * 100));
+            document.getElementById('milestone-label').textContent = label;
+            document.getElementById('milestone-fraction').textContent = `${Math.min(state.streak, target)} / ${target}`;
+            document.getElementById('milestone-bar').style.width = `${pct}%`;
+        }
+
+        /* =========================================================================
+           6. ACHIEVEMENTS & CHALLENGE MODE UNLOCK
+           ========================================================================= */
 
         function checkAchievements() {
-            if (state.streak === 10 && !state.challengeUnlocked) {
+            if (state.streak === 10 && !state.unlockedAchievements.has(10)) {
+                state.unlockedAchievements.add(10);
                 state.challengeUnlocked = true;
-                DOM.btnChallenge.disabled = false;
-                DOM.btnChallenge.innerText = 'Challenge Mode';
-                DOM.btnChallenge.className = "px-4 py-2 rounded font-medium bg-slate-700 text-white hover:bg-slate-600 transition-colors";
-                
-                triggerAchievement("Challenge Mode Unlocked!", "10 in a row! You're ready for deeper waters.");
-                setTimeout(() => setMode('challenge'), 3000);
-            } else if (state.streak === 20) {
-                triggerAchievement("Ocean Master!", "20 correct in a row. Incredible precision!");
-            } else if (state.streak === 50) {
-                triggerAchievement("Poseidon's Calculator!", "50 streak! You have mastered transformations!");
+
+                const tab = document.getElementById('tab-challenge');
+                tab.disabled = false;
+                tab.textContent = 'Challenge Mode';
+                tab.className = 'px-3.5 py-2 rounded-lg text-sm font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors';
+
+                const pill = document.getElementById('challenge-status-pill');
+                pill.textContent = 'Challenge Unlocked';
+                pill.className = 'text-xs font-medium px-2.5 py-1 rounded-full bg-teal-900/70 text-teal-200 border border-teal-500/40';
+
+                openAchievementModal(
+                    'Challenge Mode Unlocked!',
+                    '10 correct answers in a row! You are now diving into Challenge Mode with decimals, non-origin rotations, and line reflections.',
+                    true
+                );
+            } else if (state.streak === 20 && !state.unlockedAchievements.has(20)) {
+                state.unlockedAchievements.add(20);
+                openAchievementModal(
+                    'Abyssal Navigator — 20 in a row!',
+                    '20 consecutive correct transformations! Your coordinate instincts are razor sharp.',
+                    false
+                );
+            } else if (state.streak === 50 && !state.unlockedAchievements.has(50)) {
+                state.unlockedAchievements.add(50);
+                openAchievementModal(
+                    'Mariana Trench Master — 50 in a row!',
+                    '50 consecutive correct answers! You have reached the deepest level of transformation mastery.',
+                    false
+                );
             }
         }
 
-        // --- Game Mode Logic ---
-        function startGame() {
+        let pendingSwitchToChallenge = false;
+
+        function openAchievementModal(title, desc, autoSwitchChallenge) {
+            pendingSwitchToChallenge = autoSwitchChallenge;
+            document.getElementById('ach-title').textContent = title;
+            document.getElementById('ach-desc').textContent = desc;
+            const modal = document.getElementById('achievement-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeAchievementModal() {
+            const modal = document.getElementById('achievement-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            if (pendingSwitchToChallenge) {
+                pendingSwitchToChallenge = false;
+                switchMode('challenge');
+            }
+        }
+
+        /* =========================================================================
+           7. GAME MODE: SUBMARINE DASH
+           ========================================================================= */
+
+        function renderGameReadyState() {
+            document.getElementById('question-type-badge').textContent = '60-Second Timed Dive';
+            document.getElementById('question-prompt').textContent = 'Ready to launch Submarine Dash?';
+            document.getElementById('question-subtext').textContent = 'Press "Launch Submarine" on the left to start your 60-second descent.';
+            document.getElementById('options-grid').innerHTML = '';
+            document.getElementById('game-timer').textContent = '60s';
+            document.getElementById('game-depth').textContent = '0m';
+            document.getElementById('game-score').textContent = '0';
+            document.getElementById('combo-badge').textContent = '1x Combo';
+            document.getElementById('depth-bar').style.width = '0%';
+            const btn = document.getElementById('game-action-btn');
+            btn.textContent = 'Launch Submarine';
+            btn.disabled = false;
+        }
+
+        function startSubmarineDash() {
+            if (state.gameTimerId) clearInterval(state.gameTimerId);
+
             state.gameActive = true;
-            state.score = 0;
-            state.timeLeft = 60;
-            DOM.gameScore.innerText = state.score;
-            DOM.timerDisplay.innerText = state.timeLeft;
-            DOM.startGameBtn.classList.add('hidden');
-            
-            generateQuestion();
-            
-            state.timerId = setInterval(() => {
-                state.timeLeft--;
-                DOM.timerDisplay.innerText = state.timeLeft;
-                if (state.timeLeft <= 0) {
-                    endGame(true);
+            state.gameTimeLeft = 60;
+            state.gameScore = 0;
+            state.gameDepth = 0;
+            state.gameCombo = 1;
+
+            updateGameStatsUI();
+
+            const btn = document.getElementById('game-action-btn');
+            btn.textContent = 'Dive in Progress...';
+            btn.disabled = true;
+
+            loadNewQuestion();
+
+            state.gameTimerId = setInterval(() => {
+                state.gameTimeLeft = Math.max(0, state.gameTimeLeft - 1);
+                updateGameStatsUI();
+                if (state.gameTimeLeft <= 0) {
+                    stopSubmarineDash(true);
                 }
             }, 1000);
         }
 
-        function endGame(timeUp) {
-            state.gameActive = false;
-            clearInterval(state.timerId);
-            DOM.options.innerHTML = '';
-            DOM.startGameBtn.classList.remove('hidden');
-            DOM.startGameBtn.innerText = "Play Again";
-            
-            if (timeUp) {
-                DOM.question.innerText = `Time's up! Final Score: ${state.score}`;
+        function handleGameAnswer(isCorrect) {
+            if (isCorrect) {
+                const depthGain = 75 + (state.gameCombo - 1) * 25;
+                const scoreGain = 100 * state.gameCombo;
+                state.gameDepth += depthGain;
+                state.gameScore += scoreGain;
+                state.gameCombo = Math.min(5, state.gameCombo + 1);
             } else {
-                DOM.question.innerText = "Game Aborted. Click Start to try again.";
+                state.gameCombo = 1;
+                state.gameTimeLeft = Math.max(0, state.gameTimeLeft - 3);
+            }
+
+            updateGameStatsUI();
+
+            if (state.gameTimeLeft <= 0) {
+                stopSubmarineDash(true);
+            } else {
+                loadNewQuestion();
             }
         }
 
-        // --- UI Feedback Effects ---
-        function triggerAchievement(title, desc) {
-            DOM.achTitle.innerText = title;
-            DOM.achDesc.innerText = desc;
-            DOM.achModal.classList.remove('opacity-0', 'pointer-events-none');
-            DOM.achCard.classList.remove('scale-95');
-            DOM.achCard.classList.add('scale-100');
+        function updateGameStatsUI() {
+            document.getElementById('game-timer').textContent = `${state.gameTimeLeft}s`;
+            document.getElementById('game-depth').textContent = `${state.gameDepth}m`;
+            document.getElementById('game-score').textContent = state.gameScore;
+            document.getElementById('combo-badge').textContent = `${state.gameCombo}x Combo`;
+            const pct = Math.min(100, Math.round((state.gameDepth / 2000) * 100));
+            document.getElementById('depth-bar').style.width = `${pct}%`;
         }
 
-        function closeAchievement() {
-            DOM.achModal.classList.add('opacity-0', 'pointer-events-none');
-            DOM.achCard.classList.remove('scale-100');
-            DOM.achCard.classList.add('scale-95');
-        }
-
-        function showToast(msg, isSuccess) {
-            DOM.toastMsg.innerText = msg;
-            DOM.toastIcon.innerText = isSuccess ? "✅" : "❌";
-            DOM.toast.className = `toast panel border-l-4 p-4 flex items-center gap-3 w-64 ${isSuccess ? 'border-l-green-500' : 'border-l-red-500'}`;
-            DOM.toast.classList.add('show');
-            setTimeout(() => {
-                DOM.toast.classList.remove('show');
-            }, 3000);
-        }
-
-        function showFeedbackIcon(isCorrect) {
-            DOM.feedbackIcon.innerText = isCorrect ? "✅" : "❌";
-            DOM.feedbackIcon.style.opacity = '1';
-            DOM.feedbackIcon.style.transform = 'scale(1.3)';
-            setTimeout(() => {
-                DOM.feedbackIcon.style.opacity = '0';
-                DOM.feedbackIcon.style.transform = 'scale(1)';
-            }, 800);
-        }
-
-        // --- Math Helpers ---
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        function getRandomFloat(min, max) {
-            return parseFloat((Math.random() * (max - min) + min).toFixed(1));
-        }
-        function fixFloat(num) {
-            let fixed = parseFloat(num.toFixed(1));
-            return fixed === 0 ? 0 : fixed;
-        }
-        function formatPoint(p) {
-            return `(${p.x}, ${p.y})`;
-        }
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+        function stopSubmarineDash(completed) {
+            state.gameActive = false;
+            if (state.gameTimerId) {
+                clearInterval(state.gameTimerId);
+                state.gameTimerId = null;
             }
-            return array;
+
+            const btn = document.getElementById('game-action-btn');
+            btn.textContent = 'Play Again';
+            btn.disabled = false;
+
+            if (completed) {
+                document.getElementById('question-type-badge').textContent = 'Dive Complete';
+                document.getElementById('question-prompt').textContent = `Submarine surfaced! Final Depth: ${state.gameDepth}m`;
+                document.getElementById('question-subtext').textContent = `Final Score: ${state.gameScore} points. Click "Play Again" to beat your record!`;
+                document.getElementById('options-grid').innerHTML = '';
+            }
         }
+
+        /* =========================================================================
+           8. REFERENCE RULES MODAL & KEYBOARD SHORTCUT
+           ========================================================================= */
+
+        function openRulesModal() {
+            document.getElementById('rules-modal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rules-modal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        // Allow pressing Enter to advance to the next question after viewing feedback
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && state.awaitingNext && state.mode !== 'game') {
+                nextQuestion();
+            }
+        });
     </script>
 </body>
 </html>
